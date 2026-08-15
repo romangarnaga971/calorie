@@ -42,29 +42,36 @@ function ScanContent() {
     setResult(null)
 
     try {
-      // Convert to base64
-      const reader = new FileReader()
-      reader.onloadend = async () => {
-        const base64String = (reader.result as string).split(',')[1]
-        
-        // Call API
-        const res = await fetch('/api/ai/scan', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            imageBase64: base64String,
-            mimeType: file.type,
-            mode
-          })
+      // Convert to base64 using a Promise
+      const base64String = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          if (typeof reader.result === 'string') {
+            resolve(reader.result.split(',')[1])
+          } else {
+            reject(new Error('Failed to read file'))
+          }
+        }
+        reader.onerror = () => reject(new Error('Failed to read file'))
+        reader.readAsDataURL(file)
+      })
+      
+      // Call API
+      const res = await fetch('/api/ai/scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imageBase64: base64String,
+          mimeType: file.type,
+          mode
         })
+      })
 
-        const data = await res.json()
-        
-        if (!res.ok) throw new Error(data.error || 'Failed to scan')
-        
-        setResult(data)
-      }
-      reader.readAsDataURL(file)
+      const data = await res.json()
+      
+      if (!res.ok) throw new Error(data.error || 'Failed to scan')
+      
+      setResult(data)
     } catch (err: any) {
       setError(err.message)
     } finally {
