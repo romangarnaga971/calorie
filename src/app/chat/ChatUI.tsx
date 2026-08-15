@@ -72,7 +72,7 @@ export default function ChatUI({ initialMessages, sessionId }: { initialMessages
   }
 
   return (
-    <div className="flex flex-col flex-1 overflow-hidden bg-(--background)">
+    <div className="flex flex-col flex-1 overflow-hidden bg-(--background) min-h-0">
       <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-8">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full opacity-60 space-y-4">
