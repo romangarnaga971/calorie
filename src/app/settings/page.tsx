@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, LogOut, User } from 'lucide-react'
 import { signOut } from './actions'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default async function SettingsPage() {
   const supabase = await createClient()
@@ -92,6 +93,11 @@ export default async function SettingsPage() {
             <span className="font-bold text-lg">{profile.daily_calories} ккал</span>
           </div>
         </div>
+      </section>
+
+      <section className="bg-(--card) border border-(--border) rounded-2xl p-5 mb-8">
+        <h3 className="font-semibold mb-4 text-(--accent)">Вигляд</h3>
+        <ThemeToggle />
       </section>
 
       <div className="mt-auto pt-4">
