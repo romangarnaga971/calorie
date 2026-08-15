@@ -14,15 +14,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { message } = await req.json()
+    const { message, sessionId } = await req.json()
 
-    if (!message) {
-      return NextResponse.json({ error: 'Message is required' }, { status: 400 })
+    if (!message || !sessionId) {
+      return NextResponse.json({ error: 'Message and sessionId are required' }, { status: 400 })
     }
 
     // Save user message to DB
     await supabase.from('chat_messages').insert({
       user_id: user.id,
+      session_id: sessionId,
       role: 'user',
       content: message
     })
@@ -67,9 +68,19 @@ export async function POST(req: Request) {
     const { data: recentHistory } = await supabase
       .from('chat_messages')
       .select('role, content')
+      .eq('session_id', sessionId)
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(5) // Includes the message we just saved
+      
+    // Update session title if it's the first message and title is default
+    if (recentHistory?.length === 1) {
+      const newTitle = message.length > 30 ? message.substring(0, 30) + '...' : message
+      await supabase.from('chat_sessions').update({ title: newTitle }).eq('id', sessionId)
+    }
+
+    // Update session timestamp
+    await supabase.from('chat_sessions').update({ updated_at: new Date().toISOString() }).eq('id', sessionId)
       
     // Reverse to chronological
     const history = recentHistory ? recentHistory.reverse() : []
@@ -109,6 +120,7 @@ export async function POST(req: Request) {
     // Save AI message to DB
     await supabase.from('chat_messages').insert({
       user_id: user.id,
+      session_id: sessionId,
       role: 'assistant',
       content: aiMessage
     })

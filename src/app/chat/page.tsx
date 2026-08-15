@@ -1,10 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
-import ChatUI from './ChatUI'
+import { createChatSession } from './actions'
 
-export default async function ChatPage() {
+export default async function ChatIndexPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -12,26 +10,33 @@ export default async function ChatPage() {
     redirect('/login')
   }
 
-  // Load all history just for display
-  const { data: history } = await supabase
-    .from('chat_messages')
-    .select('id, role, content')
+  // Find the latest chat session
+  const { data: sessions } = await supabase
+    .from('chat_sessions')
+    .select('id')
     .eq('user_id', user.id)
-    .order('created_at', { ascending: true })
+    .order('updated_at', { ascending: false })
+    .limit(1)
+
+  if (sessions && sessions.length > 0) {
+    // Redirect to the latest session
+    redirect(`/chat/${sessions[0].id}`)
+  } else {
+    // If no sessions exist, automatically create one and redirect
+    const { data: session } = await supabase
+      .from('chat_sessions')
+      .insert({ user_id: user.id, title: 'Новий чат' })
+      .select('id')
+      .single()
+      
+    if (session) {
+      redirect(`/chat/${session.id}`)
+    }
+  }
 
   return (
-    <div className="flex flex-col flex-1 h-screen bg-(--background) animate-in">
-      <header className="flex items-center gap-4 p-6 border-b border-(--border) bg-(--card) shrink-0 shadow-sm z-10 relative">
-        <Link href="/diary" className="p-2 -ml-2 hover:bg-(--input) rounded-full transition-colors">
-          <ArrowLeft className="w-6 h-6" />
-        </Link>
-        <div className="flex flex-col">
-          <h1 className="text-xl font-bold">AI Консультант</h1>
-          <span className="text-xs text-green-500 font-medium">Онлайн</span>
-        </div>
-      </header>
-      
-      <ChatUI initialMessages={history || []} />
+    <div className="flex-1 flex items-center justify-center">
+      <span className="opacity-50">Створення чату...</span>
     </div>
   )
 }

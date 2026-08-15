@@ -10,7 +10,7 @@ type Message = {
   content: string
 }
 
-export default function ChatUI({ initialMessages }: { initialMessages: Message[] }) {
+export default function ChatUI({ initialMessages, sessionId }: { initialMessages: Message[], sessionId: string }) {
   const [messages, setMessages] = useState<Message[]>(initialMessages)
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -42,7 +42,7 @@ export default function ChatUI({ initialMessages }: { initialMessages: Message[]
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMsg })
+        body: JSON.stringify({ message: userMsg, sessionId })
       })
 
       const data = await res.json()
