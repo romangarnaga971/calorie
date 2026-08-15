@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from 'react'
 import { Loader2, Send, Sparkles, User as UserIcon } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 
+import { useRouter } from 'next/navigation'
+
 type Message = {
   id?: string
   role: 'user' | 'assistant'
@@ -11,6 +13,7 @@ type Message = {
 }
 
 export default function ChatUI({ initialMessages, sessionId }: { initialMessages: Message[], sessionId: string }) {
+  const router = useRouter()
   const [messages, setMessages] = useState<Message[]>(initialMessages)
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -50,6 +53,9 @@ export default function ChatUI({ initialMessages, sessionId }: { initialMessages
       if (!res.ok) throw new Error(data.error)
       
       setMessages(prev => [...prev, { role: 'assistant', content: data.message }])
+      
+      // Refresh the page data so the sidebar updates its title/sorting
+      router.refresh()
     } catch (err) {
       console.error(err)
       setMessages(prev => [...prev, { role: 'assistant', content: "Вибачте, сталася помилка з'єднання." }])

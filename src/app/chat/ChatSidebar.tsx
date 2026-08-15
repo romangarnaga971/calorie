@@ -120,7 +120,7 @@ export default function ChatSidebar({
                 <span className="truncate flex-1">{session.title}</span>
               </Link>
               
-              <form action={() => deleteAction(session.id)} className="absolute right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <form action={() => deleteAction(session.id)} className="absolute right-2 md:opacity-0 group-hover:opacity-100 transition-opacity">
                 <button type="submit" className="p-1.5 text-red-500 hover:bg-red-500/10 rounded-md">
                   <Trash2 className="w-4 h-4" />
                 </button>
