@@ -8,7 +8,8 @@ import { Loader2 } from 'lucide-react'
 export default function LoginPage() {
   const searchParams = useSearchParams()
   const error = searchParams.get('error')
-  const [isLogin, setIsLogin] = useState(true)
+  const isSignupMode = searchParams.get('mode') === 'signup'
+  const [isLogin, setIsLogin] = useState(!isSignupMode)
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

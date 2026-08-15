@@ -28,7 +28,7 @@ export default function Home() {
         <Link href="/login" className="w-full bg-(--accent) text-(--accent-foreground) py-4 rounded-xl font-medium shadow-sm hover:opacity-90 transition-opacity flex justify-center">
           Увійти
         </Link>
-        <Link href="/login" className="w-full bg-(--input) text-(--foreground) py-4 rounded-xl font-medium hover:opacity-90 transition-opacity flex justify-center">
+        <Link href="/login?mode=signup" className="w-full bg-(--input) text-(--foreground) py-4 rounded-xl font-medium hover:opacity-90 transition-opacity flex justify-center">
           Створити акаунт
         </Link>
       </div>
