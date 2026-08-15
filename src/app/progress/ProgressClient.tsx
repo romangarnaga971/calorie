@@ -3,6 +3,20 @@
 import { useState } from 'react'
 import { logWeight, updateNorms } from './actions'
 import { Loader2, Sparkles, Check } from 'lucide-react'
+import { useFormStatus } from 'react-dom'
+
+function SubmitWeightButton() {
+  const { pending } = useFormStatus()
+  return (
+    <button 
+      disabled={pending}
+      type="submit" 
+      className="bg-(--accent) text-(--accent-foreground) px-6 rounded-xl font-medium shadow-sm hover:opacity-90 disabled:opacity-70"
+    >
+      {pending ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Зберегти'}
+    </button>
+  )
+}
 
 type Recommendation = {
   reasoning: string
@@ -11,14 +25,9 @@ type Recommendation = {
 } | null
 
 export default function ProgressClient({ currentCalories, currentProtein, weightLogs }: { currentCalories: number, currentProtein: number, weightLogs: any[] }) {
-  const [isLogging, setIsLogging] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [recommendation, setRecommendation] = useState<Recommendation>(null)
   const [isApplying, setIsApplying] = useState(false)
-
-  const handleLogWeight = async (e: React.FormEvent<HTMLFormElement>) => {
-    setIsLogging(true)
-  }
 
   const handleAnalyze = async () => {
     setIsAnalyzing(true)
@@ -49,7 +58,7 @@ export default function ProgressClient({ currentCalories, currentProtein, weight
       {/* Weight Logging Form */}
       <section>
         <h2 className="text-lg font-semibold mb-4">Логування ваги</h2>
-        <form onSubmit={handleLogWeight} action={logWeight} className="flex gap-3">
+        <form action={logWeight} className="flex gap-3">
           <input 
             type="number" 
             name="weight" 
@@ -58,13 +67,7 @@ export default function ProgressClient({ currentCalories, currentProtein, weight
             placeholder="Ваша вага сьогодні (кг)"
             className="flex-1 bg-(--input) border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-(--accent) focus:outline-none"
           />
-          <button 
-            disabled={isLogging}
-            type="submit" 
-            className="bg-(--accent) text-(--accent-foreground) px-6 rounded-xl font-medium shadow-sm hover:opacity-90 disabled:opacity-70"
-          >
-            {isLogging ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Зберегти'}
-          </button>
+          <SubmitWeightButton />
         </form>
       </section>
 
