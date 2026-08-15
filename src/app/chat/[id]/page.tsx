@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import ChatUI from '../ChatUI'
-import { use, useEffect } from 'react'
+import { use } from 'react'
 import { useUser, useChatMessages } from '@/hooks/useSupabase'
 import { Loader2 } from 'lucide-react'
 

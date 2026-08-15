@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Loader2, Send, Sparkles, User as UserIcon } from 'lucide-react'
+import { Send, Sparkles } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 
 import { useRouter } from 'next/navigation'

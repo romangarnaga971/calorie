@@ -27,7 +27,7 @@ export default function ManualEntryPage() {
         className="flex flex-col gap-6"
       >
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium opacity-80 pl-1">Що ви з'їли?</label>
+          <label className="text-sm font-medium opacity-80 pl-1">Що ви з&apos;їли?</label>
           <input name="name" type="text" required placeholder="Напр. Вівсянка з яблуком" className="w-full bg-(--input) border-none rounded-xl px-4 py-3 text-(--foreground) focus:ring-2 focus:ring-(--accent) focus:outline-none" />
         </div>
 

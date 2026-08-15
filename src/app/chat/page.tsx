@@ -1,42 +1,36 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+'use client'
+
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import { useChatSessions, useUser } from '@/hooks/useSupabase'
+import { Loader2 } from 'lucide-react'
 import { createChatSession } from './actions'
 
-export default async function ChatIndexPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+export default function ChatIndexPage() {
+  const router = useRouter()
+  const { data: user, isLoading: isUserLoading } = useUser()
+  const { data: sessions, isLoading: isSessionsLoading } = useChatSessions()
 
-  if (!user) {
-    redirect('/login')
-  }
-
-  // Find the latest chat session
-  const { data: sessions } = await supabase
-    .from('chat_sessions')
-    .select('id')
-    .eq('user_id', user.id)
-    .order('updated_at', { ascending: false })
-    .limit(1)
-
-  if (sessions && sessions.length > 0) {
-    // Redirect to the latest session
-    redirect(`/chat/${sessions[0].id}`)
-  } else {
-    // If no sessions exist, automatically create one and redirect
-    const { data: session } = await supabase
-      .from('chat_sessions')
-      .insert({ user_id: user.id, title: 'Новий чат' })
-      .select('id')
-      .single()
-      
-    if (session) {
-      redirect(`/chat/${session.id}`)
+  useEffect(() => {
+    if (isUserLoading || isSessionsLoading) return
+    
+    if (!user) {
+      router.replace('/login')
+      return
     }
-  }
+
+    if (sessions && sessions.length > 0) {
+      router.replace(`/chat/${sessions[0].id}`)
+    } else {
+      // Auto-create first session
+      createChatSession()
+    }
+  }, [user, sessions, isUserLoading, isSessionsLoading, router])
 
   return (
-    <div className="flex-1 flex items-center justify-center">
-      <span className="opacity-50">Створення чату...</span>
+    <div className="flex-1 flex flex-col items-center justify-center min-h-[100dvh]">
+      <Loader2 className="w-8 h-8 animate-spin text-(--accent) opacity-50 mb-4" />
+      <span className="opacity-50">Відкриваємо чат...</span>
     </div>
   )
 }

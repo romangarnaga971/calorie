@@ -13,7 +13,7 @@ export function useUser() {
 }
 
 export function useProfile() {
-  const { data: user } = useUser()
+  const { data: user, isLoading: isUserLoading } = useUser()
   const fetcher = async () => {
     if (!user) return null
     const { data } = await supabase
@@ -23,11 +23,12 @@ export function useProfile() {
       .single()
     return data
   }
-  return useSWR(user ? `profile-${user.id}` : null, fetcher)
+  const swr = useSWR(user ? `profile-${user.id}` : null, fetcher)
+  return { ...swr, isLoading: isUserLoading || swr.isLoading }
 }
 
 export function useTodayEntries() {
-  const { data: user } = useUser()
+  const { data: user, isLoading: isUserLoading } = useUser()
   const fetcher = async () => {
     if (!user) return []
     const todayStart = startOfDay(new Date()).toISOString()
@@ -41,11 +42,12 @@ export function useTodayEntries() {
       .order('logged_at', { ascending: false })
     return data || []
   }
-  return useSWR(user ? `entries-today-${user.id}` : null, fetcher)
+  const swr = useSWR(user ? `entries-today-${user.id}` : null, fetcher)
+  return { ...swr, isLoading: isUserLoading || swr.isLoading }
 }
 
 export function useChatSessions() {
-  const { data: user } = useUser()
+  const { data: user, isLoading: isUserLoading } = useUser()
   const fetcher = async () => {
     if (!user) return []
     const { data } = await supabase
@@ -55,11 +57,12 @@ export function useChatSessions() {
       .order('updated_at', { ascending: false })
     return data || []
   }
-  return useSWR(user ? `chat-sessions-${user.id}` : null, fetcher)
+  const swr = useSWR(user ? `chat-sessions-${user.id}` : null, fetcher)
+  return { ...swr, isLoading: isUserLoading || swr.isLoading }
 }
 
 export function useChatMessages(sessionId: string) {
-  const { data: user } = useUser()
+  const { data: user, isLoading: isUserLoading } = useUser()
   const fetcher = async () => {
     if (!user || !sessionId) return []
     const { data } = await supabase
@@ -70,11 +73,12 @@ export function useChatMessages(sessionId: string) {
       .order('created_at', { ascending: true })
     return data || []
   }
-  return useSWR(user && sessionId ? `chat-messages-${sessionId}` : null, fetcher)
+  const swr = useSWR(user && sessionId ? `chat-messages-${sessionId}` : null, fetcher)
+  return { ...swr, isLoading: isUserLoading || swr.isLoading }
 }
 
 export function useProgressHistory() {
-  const { data: user } = useUser()
+  const { data: user, isLoading: isUserLoading } = useUser()
   const fetcher = async () => {
     if (!user) return []
     const { data } = await supabase
@@ -84,11 +88,12 @@ export function useProgressHistory() {
       .order('logged_at', { ascending: true })
     return data || []
   }
-  return useSWR(user ? `progress-history-${user.id}` : null, fetcher)
+  const swr = useSWR(user ? `progress-history-${user.id}` : null, fetcher)
+  return { ...swr, isLoading: isUserLoading || swr.isLoading }
 }
 
 export function useWeightLogs() {
-  const { data: user } = useUser()
+  const { data: user, isLoading: isUserLoading } = useUser()
   const fetcher = async () => {
     if (!user) return []
     const { data } = await supabase
@@ -99,5 +104,6 @@ export function useWeightLogs() {
       .limit(14)
     return data || []
   }
-  return useSWR(user ? `weight-logs-${user.id}` : null, fetcher)
+  const swr = useSWR(user ? `weight-logs-${user.id}` : null, fetcher)
+  return { ...swr, isLoading: isUserLoading || swr.isLoading }
 }

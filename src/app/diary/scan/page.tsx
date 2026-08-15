@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { saveScannedEntry } from './actions'
 import { Loader2, ArrowLeft, Camera, Upload, Check, MessageSquare } from 'lucide-react'
+import { AppleLoader } from '@/components/AppleLoader'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
@@ -18,6 +19,7 @@ type ScanResult = {
 }
 
 function ScanContent() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const initialMode = searchParams.get('mode') === 'label' ? 'label' : 'dish'
 
@@ -93,10 +95,10 @@ function ScanContent() {
       })
       const data = await res.json()
       if (data.sessionId) {
-        window.location.href = `/chat/${data.sessionId}`
+        router.push(`/chat/${data.sessionId}`)
       }
-    } catch (e) {
-      console.error(e)
+    } catch (err) {
+      console.error(err)
       setIsSaving(false)
     }
   }
@@ -135,9 +137,9 @@ function ScanContent() {
       )}
 
       {isScanning ? (
-        <div className="flex flex-col items-center justify-center flex-1 min-h-[300px] gap-4">
-          <Loader2 className="w-10 h-10 text-(--accent) animate-spin" />
-          <p className="text-(--foreground) opacity-70 animate-pulse text-center">
+        <div className="flex flex-col items-center justify-center flex-1 min-h-[300px] gap-8">
+          <AppleLoader />
+          <p className="text-(--foreground) opacity-70 animate-pulse text-center font-medium">
             Штучний інтелект аналізує фото...<br />Це займе кілька секунд.
           </p>
         </div>
@@ -200,7 +202,7 @@ function ScanContent() {
           {mode === 'label' && (
             <div className="flex flex-col gap-1.5 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl mb-2">
               <label className="text-sm font-semibold text-orange-700 dark:text-orange-300">
-                Скільки грамів/мл ви з'їли?
+                Скільки грамів/мл ви з&apos;їли?
               </label>
               <p className="text-xs text-orange-700/70 dark:text-orange-300/70 mb-2">
                 Калорії нижче вказані на 100г і будуть автоматично перераховані.
