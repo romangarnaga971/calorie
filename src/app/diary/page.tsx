@@ -112,12 +112,12 @@ export default async function DiaryPage() {
         <Link href="/diary/manual" className="flex flex-col items-center justify-center w-14 h-14 bg-(--input) text-(--foreground) rounded-full hover:bg-(--border) transition-colors">
           <Plus className="w-6 h-6" />
         </Link>
-        <button className="flex items-center justify-center w-16 h-16 bg-(--accent) text-(--accent-foreground) rounded-full shadow-md hover:opacity-90 transition-opacity">
+        <Link href="/diary/scan" className="flex items-center justify-center w-16 h-16 bg-(--accent) text-(--accent-foreground) rounded-full shadow-md hover:opacity-90 transition-opacity">
           <Camera className="w-7 h-7" />
-        </button>
-        <button className="flex items-center justify-center w-14 h-14 bg-(--input) text-(--foreground) rounded-full hover:bg-(--border) transition-colors">
+        </Link>
+        <Link href="/diary/scan" className="flex items-center justify-center w-14 h-14 bg-(--input) text-(--foreground) rounded-full hover:bg-(--border) transition-colors">
           <ScanBarcode className="w-6 h-6" />
-        </button>
+        </Link>
       </div>
     </div>
   )
