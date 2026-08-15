@@ -27,19 +27,30 @@ export function PushToggle() {
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window) {
-      navigator.serviceWorker.ready.then((reg) => {
-        setRegistration(reg)
-        reg.pushManager.getSubscription().then((sub) => {
-          if (sub) {
-            setIsSubscribed(true)
-            setSubscription(sub)
-          }
+      navigator.serviceWorker.getRegistration().then((reg) => {
+        if (reg) {
+          setRegistration(reg)
+          reg.pushManager.getSubscription().then((sub) => {
+            if (sub) {
+              setIsSubscribed(true)
+              setSubscription(sub)
+            }
+            setIsLoading(false)
+          }).catch((err) => {
+            console.error(err)
+            setIsLoading(false)
+          })
+        } else {
           setIsLoading(false)
-        })
+          setError('Service Worker не знайдено (PWA вимкнено в Dev режимі?)')
+        }
+      }).catch(err => {
+        setIsLoading(false)
+        setError(err.message)
       })
     } else {
       setIsLoading(false)
-      setError('Push notifications are not supported')
+      setError('Push сповіщення не підтримуються вашим браузером')
     }
   }, [])
 
