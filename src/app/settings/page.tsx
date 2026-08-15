@@ -1,10 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, LogOut, User } from 'lucide-react'
+import { ArrowLeft, User } from 'lucide-react'
 import { signOut } from './actions'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { PushToggle } from '@/components/PushToggle'
+import { SignOutButton } from './SignOutButton'
 
 export default async function SettingsPage() {
   const supabase = await createClient()
@@ -107,10 +108,7 @@ export default async function SettingsPage() {
 
       <div className="mt-auto pt-4">
         <form action={signOut}>
-          <button type="submit" className="w-full flex items-center justify-center gap-2 bg-red-500/10 text-red-500 py-4 rounded-xl font-medium hover:bg-red-500/20 transition-colors">
-            <LogOut className="w-5 h-5" />
-            Вийти з акаунту
-          </button>
+          <SignOutButton />
         </form>
       </div>
     </div>
