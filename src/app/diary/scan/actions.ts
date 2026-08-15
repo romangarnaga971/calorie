@@ -37,7 +37,7 @@ export async function saveScannedEntry(formData: FormData) {
 
   if (error) {
     console.error(error)
-    return { error: 'Failed to add scanned entry' }
+    return
   }
 
   revalidatePath('/diary')

@@ -34,7 +34,7 @@ export async function addManualEntry(formData: FormData) {
 
   if (error) {
     console.error(error)
-    return { error: 'Failed to add entry' }
+    return
   }
 
   revalidatePath('/diary')

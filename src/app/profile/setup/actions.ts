@@ -101,7 +101,7 @@ export async function saveProfile(formData: FormData) {
 
   if (error) {
     console.error(error)
-    return { error: 'Failed to save profile' }
+    return
   }
 
   revalidatePath('/profile')

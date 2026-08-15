@@ -8,7 +8,7 @@ export async function logWeight(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) return { error: 'Unauthorized' }
+  if (!user) return
 
   const weight = parseFloat(formData.get('weight') as string)
   const today = startOfDay(new Date()).toISOString()
@@ -22,7 +22,7 @@ export async function logWeight(formData: FormData) {
 
   if (error) {
     console.error(error)
-    return { error: 'Failed to log weight' }
+    return
   }
 
   // Also update current weight in profile
@@ -47,7 +47,7 @@ export async function updateNorms(caloriesChange: number, proteinChange: number)
     .eq('user_id', user.id)
     .single()
 
-  if (!profile) return { error: 'Profile not found' }
+  if (!profile) return
 
   const newCals = profile.daily_calories + caloriesChange
   const newProtein = profile.daily_protein_g + proteinChange
@@ -62,7 +62,7 @@ export async function updateNorms(caloriesChange: number, proteinChange: number)
 
   if (error) {
     console.error(error)
-    return { error: 'Failed to update norms' }
+    return
   }
 
   // Record this suggestion as accepted

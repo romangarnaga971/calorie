@@ -99,7 +99,9 @@ export async function POST(req: Request) {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents,
-      systemInstruction: systemPrompt
+      config: {
+        systemInstruction: systemPrompt
+      }
     })
 
     const aiMessage = response.text
