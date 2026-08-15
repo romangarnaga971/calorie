@@ -1,0 +1,22 @@
+{
+  "name": "AI Calorie Tracker",
+  "short_name": "Калорії AI",
+  "description": "Трекер калорій зі штучним інтелектом",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F9F9F8",
+  "theme_color": "#768670",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
