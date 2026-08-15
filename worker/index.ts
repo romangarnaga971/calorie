@@ -1,3 +1,6 @@
+// @ts-nocheck
+/// <reference lib="webworker" />
+
 declare let self: ServiceWorkerGlobalScope
 
 self.addEventListener('push', (event) => {

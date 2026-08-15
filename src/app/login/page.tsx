@@ -5,7 +5,9 @@ import { login, signup } from './actions'
 import { useSearchParams } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 
-export default function LoginPage() {
+import { Suspense } from 'react'
+
+function LoginContent() {
   const searchParams = useSearchParams()
   const error = searchParams.get('error')
   const isSignupMode = searchParams.get('mode') === 'signup'
@@ -97,5 +99,13 @@ export default function LoginPage() {
         </button>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex flex-1 items-center justify-center"><Loader2 className="w-8 h-8 animate-spin opacity-50" /></div>}>
+      <LoginContent />
+    </Suspense>
   )
 }
