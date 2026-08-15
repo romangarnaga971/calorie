@@ -13,8 +13,8 @@ export function MacroBar({ label, value, total, colorClass }: MacroBarProps) {
   return (
     <div className="flex flex-col gap-1 w-full">
       <div className="flex justify-between text-xs font-medium text-(--foreground) opacity-80">
-        <span>{label}</span>
-        <span>{value} / {total} г</span>
+        <span className="truncate pr-1">{label}</span>
+        <span className="whitespace-nowrap">{value}/{total}г</span>
       </div>
       <div className="h-2 w-full bg-(--input) rounded-full overflow-hidden">
         <div 

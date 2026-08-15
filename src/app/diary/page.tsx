@@ -63,7 +63,7 @@ export default function DiaryPage() {
       </div>
 
       {/* Macros */}
-      <div className="flex gap-4 mb-8">
+      <div className="grid grid-cols-3 gap-2 mb-8">
         <MacroBar label="Білки" value={consumedProtein} total={profile.daily_protein_g} colorClass="--color-protein" />
         <MacroBar label="Жири" value={consumedFat} total={profile.daily_fat_g} colorClass="--color-fat" />
         <MacroBar label="Вуглеводи" value={consumedCarbs} total={profile.daily_carbs_g} colorClass="--color-carbs" />
@@ -118,7 +118,7 @@ export default function DiaryPage() {
         <Link href="/diary/scan" className="flex items-center justify-center w-16 h-16 bg-(--accent) text-(--accent-foreground) rounded-full shadow-md hover:opacity-90 transition-opacity">
           <Camera className="w-7 h-7" />
         </Link>
-        <Link href="/diary/scan" className="flex items-center justify-center w-14 h-14 bg-(--input) text-(--foreground) rounded-full hover:bg-(--border) transition-colors">
+        <Link href="/diary/scan?mode=label" className="flex items-center justify-center w-14 h-14 bg-(--input) text-(--foreground) rounded-full hover:bg-(--border) transition-colors">
           <ScanBarcode className="w-6 h-6" />
         </Link>
       </div>

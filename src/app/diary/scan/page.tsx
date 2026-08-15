@@ -2,8 +2,10 @@
 
 import { useState, useRef } from 'react'
 import { saveScannedEntry } from './actions'
-import { Loader2, ArrowLeft, Camera, Upload, Check } from 'lucide-react'
+import { Loader2, ArrowLeft, Camera, Upload, Check, MessageSquare } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 
 type ScanResult = {
   name: string
@@ -15,8 +17,11 @@ type ScanResult = {
   confidence: number
 }
 
-export default function ScanPage() {
-  const [mode, setMode] = useState<'dish' | 'label'>('dish')
+function ScanContent() {
+  const searchParams = useSearchParams()
+  const initialMode = searchParams.get('mode') === 'label' ? 'label' : 'dish'
+
+  const [mode, setMode] = useState<'dish' | 'label'>(initialMode)
   const [isScanning, setIsScanning] = useState(false)
   const [result, setResult] = useState<ScanResult | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -69,8 +74,32 @@ export default function ScanPage() {
     setIsSaving(true)
   }
 
-  // Calculate actual values based on portion size if mode is label
   const multiplier = mode === 'label' ? portion / 100 : 1
+
+  const handleAskAI = async () => {
+    if (!result) return
+    setIsSaving(true) // Reuse loading state
+    
+    try {
+      const prompt = `Привіт! Я хочу з'їсти ось це: ${result.name}. Порція: ${mode === 'label' ? portion : result.weight_g}г. ` +
+                     `Там ${Math.round(result.calories * multiplier)} ккал, ${Math.round(result.protein_g * multiplier)}г білка, ` + 
+                     `${Math.round(result.fat_g * multiplier)}г жирів і ${Math.round(result.carbs_g * multiplier)}г вуглеводів. ` +
+                     `Скажи коротко, чи норм це їсти?`
+                     
+      const res = await fetch('/api/ai/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      })
+      const data = await res.json()
+      if (data.sessionId) {
+        window.location.href = `/chat/${data.sessionId}`
+      }
+    } catch (e) {
+      console.error(e)
+      setIsSaving(false)
+    }
+  }
 
   return (
     <div className="flex flex-col p-6 animate-in">
@@ -217,8 +246,28 @@ export default function ScanPage() {
           >
             {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Зберегти у щоденник'}
           </button>
+          
+          {mode === 'label' && (
+            <button 
+              type="button"
+              disabled={isSaving}
+              onClick={handleAskAI}
+              className="w-full bg-(--input) text-(--foreground) py-4 rounded-xl font-medium shadow-sm hover:opacity-90 transition-opacity mb-10 flex items-center justify-center gap-2 disabled:opacity-70"
+            >
+              <MessageSquare className="w-5 h-5 opacity-70" />
+              Запитати в AI чи можна це їсти
+            </button>
+          )}
         </form>
       )}
     </div>
+  )
+}
+
+export default function ScanPage() {
+  return (
+    <Suspense fallback={<div className="flex flex-col items-center justify-center flex-1 min-h-[100dvh]"><Loader2 className="w-8 h-8 animate-spin text-(--accent) opacity-50" /></div>}>
+      <ScanContent />
+    </Suspense>
   )
 }
