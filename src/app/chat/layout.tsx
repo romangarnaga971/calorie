@@ -21,7 +21,7 @@ export default async function ChatLayout({ children }: { children: React.ReactNo
   const isLimitReached = (sessions?.length || 0) >= 5
 
   return (
-    <div className="flex h-screen overflow-hidden bg-(--background) animate-in relative">
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-(--background) animate-in relative">
       <ChatSidebar 
         sessions={sessions || []}
         isLimitReached={isLimitReached}
