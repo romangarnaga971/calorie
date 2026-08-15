@@ -23,6 +23,13 @@ export default function ChatSidebar({
 }) {
   const [isOpen, setIsOpen] = useState(false)
 
+  // Open sidebar by default on desktop after mount to avoid hydration mismatch
+  useEffect(() => {
+    if (window.innerWidth >= 768) {
+      setIsOpen(true)
+    }
+  }, [])
+
   const toggleSidebar = () => setIsOpen(!isOpen)
 
   return (
@@ -66,8 +73,8 @@ export default function ChatSidebar({
 
       {/* Sidebar */}
       <aside 
-        className={`fixed md:relative z-50 h-full w-72 md:w-64 border-r border-(--border) bg-(--card) flex flex-col transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : '-translate-x-full md:hidden'
+        className={`fixed md:relative z-50 h-full w-72 md:w-64 shrink-0 border-r border-(--border) bg-(--card) flex flex-col transition-transform duration-300 ease-in-out ${
+          isOpen ? 'translate-x-0' : '-translate-x-full hidden'
         }`}
       >
         <div className="p-4 border-b border-(--border)">
