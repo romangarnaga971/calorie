@@ -56,9 +56,9 @@ export default async function DiaryPage() {
           <Link href="/chat" className="p-2 bg-(--input) rounded-full hover:opacity-80 flex items-center justify-center text-(--accent)">
             <MessageCircle className="w-5 h-5" />
           </Link>
-          <button className="p-2 bg-(--input) rounded-full hover:opacity-80">
+          <Link href="/settings" className="p-2 bg-(--input) rounded-full hover:opacity-80 flex items-center justify-center text-(--foreground)">
             <Settings className="w-5 h-5" />
-          </button>
+          </Link>
         </div>
       </header>
 
