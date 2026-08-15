@@ -78,7 +78,7 @@ export default function ProgressClient({ currentCalories, currentProtein, weight
           <div className="bg-(--card) border border-(--border) rounded-2xl overflow-hidden">
             {weightLogs.map((log: any, idx: number) => (
               <div key={log.id} className={`flex justify-between items-center p-4 ${idx !== weightLogs.length - 1 ? 'border-b border-(--border)' : ''}`}>
-                <span className="opacity-70">{new Date(log.date).toLocaleDateString('uk-UA', { day: 'numeric', month: 'short' })}</span>
+                <span className="opacity-70">{new Date(log.logged_at).toLocaleDateString('uk-UA', { day: 'numeric', month: 'short' })}</span>
                 <span className="font-medium">{log.weight_kg} кг</span>
               </div>
             ))}

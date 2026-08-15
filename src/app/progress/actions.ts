@@ -15,10 +15,7 @@ export async function logWeight(formData: FormData) {
 
   const { error } = await supabase
     .from('weight_logs')
-    .upsert(
-      { user_id: user.id, date: today, weight_kg: weight },
-      { onConflict: 'user_id, date' }
-    )
+    .insert({ user_id: user.id, logged_at: today, weight_kg: weight })
 
   if (error) {
     console.error(error)

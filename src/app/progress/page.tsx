@@ -22,7 +22,7 @@ export default async function ProgressPage() {
     .from('weight_logs')
     .select('*')
     .eq('user_id', user.id)
-    .order('date', { ascending: false })
+    .order('logged_at', { ascending: false })
     .limit(14)
 
   return (
