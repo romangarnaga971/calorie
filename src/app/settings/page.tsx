@@ -69,7 +69,7 @@ export default async function SettingsPage() {
           </div>
           <div className="flex justify-between items-center">
             <span className="opacity-70">Стать</span>
-            <span className="font-medium">{profile.gender === 'male' ? 'Чоловіча' : 'Жіноча'}</span>
+            <span className="font-medium">{profile.sex === 'male' ? 'Чоловіча' : 'Жіноча'}</span>
           </div>
         </div>
       </section>
