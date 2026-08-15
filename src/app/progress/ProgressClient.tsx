@@ -53,7 +53,7 @@ export default function ProgressClient({ currentCalories, currentProtein, weight
           <input 
             type="number" 
             name="weight" 
-            step="0.1" 
+            step="any" 
             required 
             placeholder="Ваша вага сьогодні (кг)"
             className="flex-1 bg-(--input) border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-(--accent) focus:outline-none"
@@ -67,6 +67,21 @@ export default function ProgressClient({ currentCalories, currentProtein, weight
           </button>
         </form>
       </section>
+
+      {/* Weight History */}
+      {weightLogs && weightLogs.length > 0 && (
+        <section>
+          <h2 className="text-lg font-semibold mb-3">Історія зважувань</h2>
+          <div className="bg-(--card) border border-(--border) rounded-2xl overflow-hidden">
+            {weightLogs.map((log: any, idx: number) => (
+              <div key={log.id} className={`flex justify-between items-center p-4 ${idx !== weightLogs.length - 1 ? 'border-b border-(--border)' : ''}`}>
+                <span className="opacity-70">{new Date(log.date).toLocaleDateString('uk-UA', { day: 'numeric', month: 'short' })}</span>
+                <span className="font-medium">{log.weight_kg} кг</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* AI Analysis */}
       <section>

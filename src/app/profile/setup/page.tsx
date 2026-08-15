@@ -50,7 +50,7 @@ export default function ProfileSetupPage() {
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium opacity-80 pl-1">Вага (кг)</label>
-              <input name="weight" type="number" step="0.1" min="30" max="300" required placeholder="70" className="w-full bg-(--input) rounded-xl px-4 py-3 focus:ring-2 focus:ring-(--accent) focus:outline-none" />
+              <input name="weight" type="number" step="any" min="30" max="300" required placeholder="70" className="w-full bg-(--input) rounded-xl px-4 py-3 focus:ring-2 focus:ring-(--accent) focus:outline-none" />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium opacity-80 pl-1">Зріст (см)</label>
