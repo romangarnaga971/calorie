@@ -1,28 +1,35 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+'use client'
+
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, User } from 'lucide-react'
+import { ArrowLeft, User, Loader2 } from 'lucide-react'
 import { signOut } from './actions'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { PushToggle } from '@/components/PushToggle'
 import { SignOutButton } from './SignOutButton'
+import { useProfile, useUser } from '@/hooks/useSupabase'
 
-export default async function SettingsPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+export default function SettingsPage() {
+  const router = useRouter()
+  const { data: user, isLoading: isUserLoading } = useUser()
+  const { data: profile, isLoading: isProfileLoading } = useProfile()
 
-  if (!user) {
-    redirect('/login')
+  if (isUserLoading || isProfileLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center flex-1 min-h-[100dvh]">
+        <Loader2 className="w-8 h-8 animate-spin text-(--accent) opacity-50" />
+      </div>
+    )
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('user_id', user.id)
-    .single()
+  if (!user) {
+    router.replace('/login')
+    return null
+  }
 
   if (!profile) {
-    redirect('/profile/setup')
+    router.replace('/profile/setup')
+    return null
   }
 
   const goalLabels: Record<string, string> = {

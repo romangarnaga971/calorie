@@ -1,35 +1,31 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
-import ChatUI from '../ChatUI'
+'use client'
 
-export default async function ChatSessionPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+import { useRouter } from 'next/navigation'
+import ChatUI from '../ChatUI'
+import { use, useEffect } from 'react'
+import { useUser, useChatMessages } from '@/hooks/useSupabase'
+import { Loader2 } from 'lucide-react'
+
+export default function ChatSessionPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
+  const router = useRouter()
+  const { data: user, isLoading: isUserLoading } = useUser()
+  const { data: history, isLoading: isHistoryLoading } = useChatMessages(id)
+
+  if (isUserLoading || isHistoryLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center flex-1 min-h-[100dvh]">
+        <Loader2 className="w-8 h-8 animate-spin text-(--accent) opacity-50" />
+      </div>
+    )
+  }
 
   if (!user) {
-    redirect('/login')
+    router.replace('/login')
+    return null
   }
 
-  // Verify session belongs to user
-  const { data: session } = await supabase
-    .from('chat_sessions')
-    .select('id')
-    .eq('id', id)
-    .eq('user_id', user.id)
-    .single()
 
-  if (!session) {
-    redirect('/chat')
-  }
-
-  // Fetch messages for this session
-  const { data: history } = await supabase
-    .from('chat_messages')
-    .select('id, role, content')
-    .eq('session_id', id)
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: true })
 
   return <ChatUI initialMessages={history || []} sessionId={id} />
 }

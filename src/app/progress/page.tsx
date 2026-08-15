@@ -1,29 +1,36 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
-import Link from 'next/link'
-import { ArrowLeft, TrendingDown, TrendingUp, Minus } from 'lucide-react'
-import ProgressClient from './ProgressClient'
+'use client'
 
-export default async function ProgressPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { ArrowLeft, TrendingDown, TrendingUp, Minus, Loader2 } from 'lucide-react'
+import ProgressClient from './ProgressClient'
+import { useProfile, useUser, useWeightLogs } from '@/hooks/useSupabase'
+
+export default function ProgressPage() {
+  const router = useRouter()
+  const { data: user, isLoading: isUserLoading } = useUser()
+  const { data: profile, isLoading: isProfileLoading } = useProfile()
+  const { data: weightLogs, isLoading: isWeightLoading } = useWeightLogs()
+
+  if (isUserLoading || isProfileLoading || isWeightLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center flex-1 min-h-[100dvh]">
+        <Loader2 className="w-8 h-8 animate-spin text-(--accent) opacity-50" />
+      </div>
+    )
+  }
 
   if (!user) {
-    redirect('/login')
+    router.replace('/login')
+    return null
   }
 
-  const { data: profile } = await supabase.from('profiles').select('*').eq('user_id', user.id).single()
-  
   if (!profile) {
-    redirect('/profile/setup')
+    router.replace('/profile/setup')
+    return null
   }
 
-  const { data: weightLogs } = await supabase
-    .from('weight_logs')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('logged_at', { ascending: false })
-    .limit(14)
+
 
   return (
     <div className="flex flex-col flex-1 p-6 pb-24 animate-in">

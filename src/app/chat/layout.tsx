@@ -1,22 +1,30 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+'use client'
+
+import { useRouter } from 'next/navigation'
 import { createChatSession, deleteChatSession } from './actions'
 import ChatSidebar from './ChatSidebar'
+import { useUser, useChatSessions } from '@/hooks/useSupabase'
+import { Loader2 } from 'lucide-react'
 
-export default async function ChatLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+export default function ChatLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter()
+  const { data: user, isLoading: isUserLoading } = useUser()
+  const { data: sessions, isLoading: isSessionsLoading } = useChatSessions()
 
-  if (!user) {
-    redirect('/login')
+  if (isUserLoading || isSessionsLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center flex-1 min-h-[100dvh]">
+        <Loader2 className="w-8 h-8 animate-spin text-(--accent) opacity-50" />
+      </div>
+    )
   }
 
-  // Fetch chat sessions
-  const { data: sessions } = await supabase
-    .from('chat_sessions')
-    .select('id, title, updated_at')
-    .eq('user_id', user.id)
-    .order('updated_at', { ascending: false })
+  if (!user) {
+    router.replace('/login')
+    return null
+  }
+
+
 
   const isLimitReached = (sessions?.length || 0) >= 5
 

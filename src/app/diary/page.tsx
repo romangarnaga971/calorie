@@ -1,42 +1,32 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+'use client'
+
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ProgressRing } from '@/components/ProgressRing'
 import { MacroBar } from '@/components/MacroBar'
-import { startOfDay, endOfDay } from 'date-fns'
-import { Plus, Camera, ScanBarcode, Settings, MessageCircle, LineChart } from 'lucide-react'
+import { Plus, Camera, ScanBarcode, Settings, MessageCircle, LineChart, Loader2 } from 'lucide-react'
 import { deleteFoodEntry } from './actions'
+import { useProfile, useTodayEntries } from '@/hooks/useSupabase'
 
-export default async function DiaryPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+export default function DiaryPage() {
+  const router = useRouter()
+  const { data: profile, isLoading: isProfileLoading } = useProfile()
+  const { data: entries, isLoading: isEntriesLoading, mutate } = useTodayEntries()
 
-  if (!user) {
-    redirect('/login')
+  if (isProfileLoading || isEntriesLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center flex-1 min-h-[100dvh]">
+        <Loader2 className="w-8 h-8 animate-spin text-(--accent) opacity-50" />
+      </div>
+    )
   }
-
-  // Get Profile
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('user_id', user.id)
-    .single()
 
   if (!profile) {
-    redirect('/profile/setup')
+    router.replace('/profile/setup')
+    return null
   }
 
-  // Get today's food entries
-  const todayStart = startOfDay(new Date()).toISOString()
-  const todayEnd = endOfDay(new Date()).toISOString()
 
-  const { data: entries } = await supabase
-    .from('food_entries')
-    .select('*')
-    .eq('user_id', user.id)
-    .gte('logged_at', todayStart)
-    .lte('logged_at', todayEnd)
-    .order('logged_at', { ascending: false })
 
   const consumedCalories = entries?.reduce((sum, e) => sum + e.calories, 0) || 0
   const consumedProtein = entries?.reduce((sum, e) => sum + e.protein_g, 0) || 0
@@ -97,14 +87,19 @@ export default async function DiaryPage() {
               </div>
               <div className="flex items-center gap-4">
                 <span className="font-bold text-lg">{entry.calories} <span className="text-xs opacity-60 font-normal">ккал</span></span>
-                <form action={async () => {
-                  'use server';
-                  await deleteFoodEntry(entry.id);
-                }}>
-                  <button type="submit" className="text-red-400 opacity-60 hover:opacity-100 p-1">
-                    ✕
-                  </button>
-                </form>
+                <button
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    // Optimistic update
+                    const newEntries = entries.filter(item => item.id !== entry.id);
+                    mutate(newEntries, false);
+                    await deleteFoodEntry(entry.id);
+                    mutate();
+                  }}
+                  className="text-red-400 opacity-60 hover:opacity-100 p-1"
+                >
+                  ✕
+                </button>
               </div>
             </div>
           ))
