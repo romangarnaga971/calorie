@@ -1,6 +1,15 @@
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect('/diary');
+  }
+
   return (
     <div className="flex flex-col items-center justify-center flex-1 p-6 text-center animate-in">
       <div className="w-16 h-16 bg-(--accent) text-(--accent-foreground) rounded-2xl flex items-center justify-center mb-6 shadow-md">

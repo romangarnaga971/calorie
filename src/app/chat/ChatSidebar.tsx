@@ -18,7 +18,7 @@ export default function ChatSidebar({
 }: { 
   sessions: Session[] | null
   isLimitReached: boolean
-  createAction: () => void
+  createAction: (payload?: any) => void
   deleteAction: (id: string) => void
 }) {
   const [isOpen, setIsOpen] = useState(false)
