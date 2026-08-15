@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ArrowLeft, LogOut, User } from 'lucide-react'
 import { signOut } from './actions'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { PushToggle } from '@/components/PushToggle'
 
 export default async function SettingsPage() {
   const supabase = await createClient()
@@ -98,6 +99,10 @@ export default async function SettingsPage() {
       <section className="bg-(--card) border border-(--border) rounded-2xl p-5 mb-8">
         <h3 className="font-semibold mb-4 text-(--accent)">Вигляд</h3>
         <ThemeToggle />
+      </section>
+
+      <section className="bg-(--card) border border-(--border) rounded-2xl p-5 mb-8">
+        <PushToggle />
       </section>
 
       <div className="mt-auto pt-4">
