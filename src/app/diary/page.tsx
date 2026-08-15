@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { ProgressRing } from '@/components/ProgressRing'
 import { MacroBar } from '@/components/MacroBar'
 import { startOfDay, endOfDay } from 'date-fns'
-import { Plus, Camera, ScanBarcode, Settings, MessageCircle } from 'lucide-react'
+import { Plus, Camera, ScanBarcode, Settings, MessageCircle, LineChart } from 'lucide-react'
 import { deleteFoodEntry } from './actions'
 
 export default async function DiaryPage() {
@@ -50,6 +50,9 @@ export default async function DiaryPage() {
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold">Щоденник</h1>
         <div className="flex gap-2">
+          <Link href="/progress" className="p-2 bg-(--input) rounded-full hover:opacity-80 flex items-center justify-center text-(--foreground)">
+            <LineChart className="w-5 h-5" />
+          </Link>
           <Link href="/chat" className="p-2 bg-(--input) rounded-full hover:opacity-80 flex items-center justify-center text-(--accent)">
             <MessageCircle className="w-5 h-5" />
           </Link>
