@@ -1,26 +1,82 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  
+  /* Utilities for progress bars, etc */
+  --color-protein: #f87171; /* red-400 */
+  --color-fat: #fbbf24; /* amber-400 */
+  --color-carbs: #60a5fa; /* blue-400 */
+}
+
+:root {
+  /* Warm off-white background */
+  --background: #fdfbf7;
+  --foreground: #1a1c1e;
+  
+  /* Muted Sage Green */
+  --accent: #7a9c86;
+  --accent-foreground: #ffffff;
+  
+  --card: #ffffff;
+  --card-foreground: #1a1c1e;
+  
+  --border: #e2e0dc;
+  --input: #f0eee9;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* Deep ink-graphite */
+    --background: #14171a;
+    --foreground: #f3f4f6;
+    
+    --accent: #6a8c76;
+    --accent-foreground: #ffffff;
+    
+    --card: #1c2024;
+    --card-foreground: #f3f4f6;
+    
+    --border: #2c3238;
+    --input: #23282d;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Base animations for UI */
+@layer utilities {
+  .animate-in {
+    animation: animate-in 0.2s ease-out;
+  }
+  
+  @keyframes animate-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
