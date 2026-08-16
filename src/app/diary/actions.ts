@@ -43,3 +43,23 @@ export async function addWaterEntry(amount_ml: number) {
 
   revalidatePath('/diary')
 }
+
+export async function deleteWaterEntry(id: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return { error: 'Unauthorized' }
+
+  const { error } = await supabase
+    .from('water_logs')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', user.id)
+
+  if (error) {
+    console.error(error)
+    return { error: 'Failed to delete water' }
+  }
+
+  revalidatePath('/diary')
+}

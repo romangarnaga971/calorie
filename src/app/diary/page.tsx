@@ -4,10 +4,9 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ProgressRing } from '@/components/ProgressRing'
 import { MacroBar } from '@/components/MacroBar'
-import { Plus, Camera, ScanBarcode, Settings, MessageCircle, LineChart, Loader2 } from 'lucide-react'
-import { deleteFoodEntry } from './actions'
+import { Plus, Camera, ScanBarcode, Settings, MessageCircle, LineChart, Loader2, Repeat } from 'lucide-react'
+import { deleteFoodEntry, deleteWaterEntry, addWaterEntry } from './actions'
 import { useProfile, useTodayEntries, useTodayWater } from '@/hooks/useSupabase'
-import { addWaterEntry } from './actions'
 import { WaterTrackerButton } from '@/components/WaterTrackerButton'
 import { useState } from 'react'
 
@@ -69,6 +68,11 @@ export default function DiaryPage() {
         className="relative flex justify-center mb-8 mx-auto w-64 h-64"
         style={{ perspective: '1000px' }}
       >
+        {/* The rotate hint icon */}
+        <div className="absolute top-0 right-0 p-2 bg-(--input) text-(--foreground) opacity-60 rounded-full z-10 pointer-events-none transition-opacity duration-300">
+          <Repeat className="w-5 h-5" />
+        </div>
+
         <div 
           className="w-full h-full relative transition-transform duration-700 cursor-pointer"
           style={{ 
@@ -79,7 +83,7 @@ export default function DiaryPage() {
         >
           {/* Front (Calories) */}
           <div 
-            className="absolute inset-0 backface-hidden"
+            className="absolute inset-0 flex items-center justify-center backface-hidden"
             style={{ backfaceVisibility: 'hidden' }}
           >
             <ProgressRing 
@@ -92,7 +96,7 @@ export default function DiaryPage() {
           
           {/* Back (Water) */}
           <div 
-            className="absolute inset-0 backface-hidden"
+            className="absolute inset-0 flex items-center justify-center backface-hidden"
             style={{ 
               backfaceVisibility: 'hidden',
               transform: 'rotateY(180deg)' 
@@ -112,8 +116,33 @@ export default function DiaryPage() {
       <div className="px-6 flex-1 flex flex-col relative">
         {/* We use position absolute to crossfade or we just conditionally render */}
         {isWaterMode ? (
-          <div className="flex-1 flex flex-col items-center animate-in fade-in zoom-in-95 duration-300">
+          <div className="flex-1 flex flex-col items-center animate-in fade-in zoom-in-95 duration-300 w-full">
             <WaterTrackerButton onAdd={handleAddWater} />
+            
+            {/* Water History */}
+            <div className="w-full mt-8 flex flex-col gap-2 pb-8">
+              {waterLogs && waterLogs.length > 0 ? (
+                waterLogs.map((log) => (
+                  <div key={log.id} className="flex justify-between items-center p-3 bg-(--card) shadow-sm border border-(--border)/50 rounded-xl w-full">
+                    <span className="font-medium text-blue-500">{log.amount_ml} мл</span>
+                    <button
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        const newLogs = waterLogs.filter(item => item.id !== log.id);
+                        mutateWater(newLogs, false);
+                        await deleteWaterEntry(log.id);
+                        mutateWater();
+                      }}
+                      className="text-red-400 opacity-60 hover:opacity-100 p-2"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center p-4 text-sm opacity-50">Немає записів</div>
+              )}
+            </div>
           </div>
         ) : (
           <div className="flex-1 flex flex-col animate-in fade-in zoom-in-95 duration-300">
