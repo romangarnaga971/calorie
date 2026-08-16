@@ -4,11 +4,12 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ProgressRing } from '@/components/ProgressRing'
 import { MacroBar } from '@/components/MacroBar'
-import { Plus, Camera, ScanBarcode, Settings, MessageCircle, LineChart, Loader2, Repeat, ChevronDown } from 'lucide-react'
+import { Plus, Camera, ScanBarcode, Settings, MessageCircle, LineChart, Loader2, Repeat, History } from 'lucide-react'
 import { deleteFoodEntry, deleteWaterEntry, addWaterEntry } from './actions'
 import { useProfile, useTodayEntries, useTodayWater } from '@/hooks/useSupabase'
 import { WaterTrackerButton } from '@/components/WaterTrackerButton'
 import { useState } from 'react'
+import { Drawer } from 'vaul'
 
 export default function DiaryPage() {
   const router = useRouter()
@@ -119,41 +120,51 @@ export default function DiaryPage() {
           <div className="flex-1 flex flex-col items-center animate-in fade-in zoom-in-95 duration-300 w-full">
             <WaterTrackerButton onAdd={handleAddWater} />
             
-            {/* Scroll down hint */}
-            {waterLogs && waterLogs.length > 0 && (
-              <button 
-                onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
-                className="flex flex-col items-center gap-1 opacity-40 hover:opacity-100 transition-opacity animate-bounce mt-4 mb-4 text-sm font-medium"
-              >
-                <span>Історія випитої води ({waterLogs.length})</span>
-                <ChevronDown className="w-5 h-5" />
-              </button>
-            )}
-            
-            {/* Water History */}
-            <div className="w-full mt-4 flex flex-col gap-2 pb-8">
-              {waterLogs && waterLogs.length > 0 ? (
-                waterLogs.map((log) => (
-                  <div key={log.id} className="flex justify-between items-center p-3 bg-(--card) shadow-sm border border-(--border)/50 rounded-xl w-full">
-                    <span className="font-medium text-blue-500">{log.amount_ml} мл</span>
-                    <button
-                      onClick={async (e) => {
-                        e.preventDefault();
-                        const newLogs = waterLogs.filter(item => item.id !== log.id);
-                        mutateWater(newLogs, false);
-                        await deleteWaterEntry(log.id);
-                        mutateWater();
-                      }}
-                      className="text-red-400 opacity-60 hover:opacity-100 p-2"
-                    >
-                      ✕
-                    </button>
+            <Drawer.Root>
+              <Drawer.Trigger asChild>
+                <button className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity mt-6 bg-(--input) px-5 py-2.5 rounded-full text-sm font-medium">
+                  <History className="w-4 h-4" />
+                  Історія води ({waterLogs?.length || 0})
+                </button>
+              </Drawer.Trigger>
+              <Drawer.Portal>
+                <Drawer.Overlay className="fixed inset-0 bg-black/40 z-50" />
+                <Drawer.Content className="bg-(--background) flex flex-col rounded-t-3xl h-[80vh] mt-24 fixed bottom-0 left-0 right-0 z-50 outline-none">
+                  <div className="p-4 bg-(--background) rounded-t-3xl flex-1 overflow-y-auto">
+                    <div className="mx-auto w-12 h-1.5 shrink-0 rounded-full bg-gray-300 dark:bg-gray-700 mb-8" />
+                    <div className="max-w-md mx-auto">
+                      <Drawer.Title className="font-bold text-xl mb-4 px-2">Історія випитої води</Drawer.Title>
+                      
+                      <div className="flex flex-col gap-2 pb-24">
+                        {waterLogs && waterLogs.length > 0 ? (
+                          waterLogs.map((log) => (
+                            <div key={log.id} className="flex justify-between items-center p-4 bg-(--card) shadow-sm border border-(--border)/50 rounded-2xl w-full">
+                              <span className="font-medium text-blue-500 text-lg">{log.amount_ml} мл</span>
+                              <button
+                                onClick={async (e) => {
+                                  e.preventDefault();
+                                  const newLogs = waterLogs.filter(item => item.id !== log.id);
+                                  mutateWater(newLogs, false);
+                                  await deleteWaterEntry(log.id);
+                                  mutateWater();
+                                }}
+                                className="text-red-400 opacity-60 hover:opacity-100 p-2"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center p-8 text-sm opacity-50 border-2 border-dashed border-(--border) rounded-2xl">
+                            Немає записів
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                ))
-              ) : (
-                <div className="text-center p-4 text-sm opacity-50">Немає записів</div>
-              )}
-            </div>
+                </Drawer.Content>
+              </Drawer.Portal>
+            </Drawer.Root>
           </div>
         ) : (
           <div className="flex-1 flex flex-col animate-in fade-in zoom-in-95 duration-300">
