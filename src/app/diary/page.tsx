@@ -6,14 +6,20 @@ import { ProgressRing } from '@/components/ProgressRing'
 import { MacroBar } from '@/components/MacroBar'
 import { Plus, Camera, ScanBarcode, Settings, MessageCircle, LineChart, Loader2 } from 'lucide-react'
 import { deleteFoodEntry } from './actions'
-import { useProfile, useTodayEntries } from '@/hooks/useSupabase'
+import { useProfile, useTodayEntries, useTodayWater } from '@/hooks/useSupabase'
+import { addWaterEntry } from './actions'
+import { WaterTrackerButton } from '@/components/WaterTrackerButton'
+import { useState } from 'react'
 
 export default function DiaryPage() {
   const router = useRouter()
   const { data: profile, isLoading: isProfileLoading } = useProfile()
   const { data: entries, isLoading: isEntriesLoading, mutate } = useTodayEntries()
+  const { data: waterLogs, isLoading: isWaterLoading, mutate: mutateWater } = useTodayWater()
+  
+  const [isWaterMode, setIsWaterMode] = useState(false)
 
-  if (isProfileLoading || isEntriesLoading) {
+  if (isProfileLoading || isEntriesLoading || isWaterLoading) {
     return (
       <div className="flex flex-col items-center justify-center flex-1 min-h-[100dvh]">
         <Loader2 className="w-8 h-8 animate-spin text-(--accent) opacity-50" />
@@ -35,8 +41,20 @@ export default function DiaryPage() {
 
   const calProgress = profile.daily_calories > 0 ? consumedCalories / profile.daily_calories : 0
 
+  const consumedWater = waterLogs?.reduce((sum, e) => sum + e.amount_ml, 0) || 0
+  const waterGoal = profile.daily_water_ml || 2000
+  const waterProgress = waterGoal > 0 ? consumedWater / waterGoal : 0
+
+  const handleAddWater = async (amount: number) => {
+    // Optimistic update
+    const newLog = { id: Math.random().toString(), user_id: profile.id, amount_ml: amount, logged_at: new Date().toISOString() }
+    mutateWater([newLog, ...(waterLogs || [])], false)
+    await addWaterEntry(amount)
+    mutateWater()
+  }
+
   return (
-    <div className="flex flex-col flex-1 p-6 pb-24 animate-in">
+    <div className="flex flex-col flex-1 pb-24 animate-in overflow-hidden">
       <header className="flex items-center justify-between p-6 pb-2">
         <h1 className="text-2xl font-bold">Yabka</h1>
         <div className="flex items-center gap-3">
@@ -46,27 +64,70 @@ export default function DiaryPage() {
         </div>
       </header>
 
-      {/* Calories Ring */}
-      <div className="flex justify-center mb-8">
-        <ProgressRing 
-          progress={calProgress} 
-          label="ккал" 
-          value={consumedCalories} 
-          total={profile.daily_calories} 
-        />
+      {/* 3D Flip Container */}
+      <div 
+        className="relative flex justify-center mb-8 mx-auto w-64 h-64"
+        style={{ perspective: '1000px' }}
+      >
+        <div 
+          className="w-full h-full relative transition-transform duration-700 cursor-pointer"
+          style={{ 
+            transformStyle: 'preserve-3d', 
+            transform: isWaterMode ? 'rotateY(180deg)' : 'rotateY(0deg)'
+          }}
+          onClick={() => setIsWaterMode(!isWaterMode)}
+        >
+          {/* Front (Calories) */}
+          <div 
+            className="absolute inset-0 backface-hidden"
+            style={{ backfaceVisibility: 'hidden' }}
+          >
+            <ProgressRing 
+              progress={calProgress} 
+              label="ккал" 
+              value={consumedCalories} 
+              total={profile.daily_calories} 
+            />
+          </div>
+          
+          {/* Back (Water) */}
+          <div 
+            className="absolute inset-0 backface-hidden"
+            style={{ 
+              backfaceVisibility: 'hidden',
+              transform: 'rotateY(180deg)' 
+            }}
+          >
+            <ProgressRing 
+              progress={waterProgress} 
+              label="мл" 
+              value={consumedWater} 
+              total={waterGoal}
+              color="#3b82f6"
+            />
+          </div>
+        </div>
       </div>
 
-      {/* Macros */}
-      <div className="grid grid-cols-3 gap-2 mb-8">
-        <MacroBar label="Білки" value={consumedProtein} total={profile.daily_protein_g} colorClass="--color-protein" />
-        <MacroBar label="Жири" value={consumedFat} total={profile.daily_fat_g} colorClass="--color-fat" />
-        <MacroBar label="Вуглеводи" value={consumedCarbs} total={profile.daily_carbs_g} colorClass="--color-carbs" />
-      </div>
+      <div className="px-6 flex-1 flex flex-col relative">
+        {/* We use position absolute to crossfade or we just conditionally render */}
+        {isWaterMode ? (
+          <div className="flex-1 flex flex-col items-center animate-in fade-in zoom-in-95 duration-300">
+            <WaterTrackerButton onAdd={handleAddWater} />
+          </div>
+        ) : (
+          <div className="flex-1 flex flex-col animate-in fade-in zoom-in-95 duration-300">
+            {/* Macros */}
+            <div className="grid grid-cols-3 gap-2 mb-8">
+              <MacroBar label="Білки" value={consumedProtein} total={profile.daily_protein_g} colorClass="--color-protein" />
+              <MacroBar label="Жири" value={consumedFat} total={profile.daily_fat_g} colorClass="--color-fat" />
+              <MacroBar label="Вуглеводи" value={consumedCarbs} total={profile.daily_carbs_g} colorClass="--color-carbs" />
+            </div>
 
-      {/* Entries List */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">Сьогодні</h2>
-      </div>
+            {/* Entries List */}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Сьогодні</h2>
+            </div>
 
       <div className="flex flex-col gap-3">
         {entries && entries.length > 0 ? (
@@ -101,6 +162,9 @@ export default function DiaryPage() {
           <div className="text-center p-8 border-2 border-dashed border-(--border) rounded-2xl opacity-60">
             Поки нічого не додано.
           </div>
+        )}
+      </div>
+    </div>
         )}
       </div>
 

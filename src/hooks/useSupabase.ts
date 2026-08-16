@@ -46,6 +46,25 @@ export function useTodayEntries() {
   return { ...swr, isLoading: isUserLoading || swr.isLoading }
 }
 
+export function useTodayWater() {
+  const { data: user, isLoading: isUserLoading } = useUser()
+  const fetcher = async () => {
+    if (!user) return []
+    const todayStart = startOfDay(new Date()).toISOString()
+    const todayEnd = endOfDay(new Date()).toISOString()
+    const { data } = await supabase
+      .from('water_logs')
+      .select('*')
+      .eq('user_id', user.id)
+      .gte('logged_at', todayStart)
+      .lte('logged_at', todayEnd)
+      .order('logged_at', { ascending: false })
+    return data || []
+  }
+  const swr = useSWR(user ? `water-today-${user.id}` : null, fetcher)
+  return { ...swr, isLoading: isUserLoading || swr.isLoading }
+}
+
 export function useChatSessions() {
   const { data: user, isLoading: isUserLoading } = useUser()
   const fetcher = async () => {

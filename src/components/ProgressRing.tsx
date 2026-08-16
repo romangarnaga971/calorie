@@ -7,9 +7,10 @@ interface ProgressRingProps {
   label: string;
   value: number;
   total: number;
+  color?: string;
 }
 
-export function ProgressRing({ progress, size = 180, strokeWidth = 14, label, value, total }: ProgressRingProps) {
+export function ProgressRing({ progress, size = 180, strokeWidth = 14, label, value, total, color = "var(--accent)" }: ProgressRingProps) {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   // Cap progress at 1 for the visual ring
@@ -30,7 +31,7 @@ export function ProgressRing({ progress, size = 180, strokeWidth = 14, label, va
         />
         {/* Progress Ring */}
         <circle
-          stroke="var(--accent)"
+          stroke={color}
           fill="transparent"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
