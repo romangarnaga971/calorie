@@ -107,13 +107,33 @@ export async function POST(req: Request) {
       parts: [{ text: msg.content }]
     }))
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
+    let response;
+    let fallbackUsed = false;
+    
+    const requestConfig = {
       contents,
       config: {
         systemInstruction: systemPrompt
       }
-    })
+    };
+
+    try {
+      response = await ai.models.generateContent({
+        model: 'gemini-3.5-flash',
+        ...requestConfig
+      })
+    } catch (apiError: any) {
+      if (apiError?.status === 429 || apiError?.message?.toLowerCase().includes('quota') || apiError?.message?.toLowerCase().includes('exhausted')) {
+        console.warn("Primary model rate limited in chat, falling back to gemini-3.5-flash-lite");
+        fallbackUsed = true;
+        response = await ai.models.generateContent({
+          model: 'gemini-3.5-flash-lite',
+          ...requestConfig
+        })
+      } else {
+        throw apiError;
+      }
+    }
 
     const aiMessage = response.text
 
@@ -125,7 +145,7 @@ export async function POST(req: Request) {
       content: aiMessage
     })
 
-    return NextResponse.json({ message: aiMessage })
+    return NextResponse.json({ message: aiMessage, fallbackUsed })
 
   } catch (error: any) {
     console.error('Chat API Error:', error)

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { logWeight, updateNorms } from './actions'
 import { Loader2, Sparkles, Check } from 'lucide-react'
 import { useFormStatus } from 'react-dom'
+import { toast } from 'sonner'
 
 function SubmitWeightButton() {
   const { pending } = useFormStatus()
@@ -36,6 +37,9 @@ export default function ProgressClient({ currentCalories, currentProtein, weight
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
       setRecommendation(data)
+      if (data.fallbackUsed) {
+        toast.info('Використано базову модель (3.5 Flash Lite) через високе навантаження.')
+      }
     } catch (err) {
       console.error(err)
       alert("Помилка аналізу.")

@@ -61,13 +61,34 @@ export async function POST(req: Request) {
       }
     `
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
+    let response;
+    let fallbackUsed = false;
+    
+    const requestConfig = {
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       config: { responseMimeType: 'application/json' }
-    })
+    };
+
+    try {
+      response = await ai.models.generateContent({
+        model: 'gemini-3.5-flash',
+        ...requestConfig
+      })
+    } catch (apiError: any) {
+      if (apiError?.status === 429 || apiError?.message?.toLowerCase().includes('quota') || apiError?.message?.toLowerCase().includes('exhausted')) {
+        console.warn("Primary model rate limited in adapt, falling back to gemini-3.5-flash-lite");
+        fallbackUsed = true;
+        response = await ai.models.generateContent({
+          model: 'gemini-3.5-flash-lite',
+          ...requestConfig
+        })
+      } else {
+        throw apiError;
+      }
+    }
 
     const parsed = JSON.parse(response.text || '{}')
+    parsed.fallbackUsed = fallbackUsed;
 
     return NextResponse.json(parsed)
   } catch (error: any) {

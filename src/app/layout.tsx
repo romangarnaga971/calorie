@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { Toaster } from 'sonner';
 
 const inter = Inter({
   variable: "--font-inter",
@@ -30,6 +31,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <div className="w-full max-w-md bg-(--background) min-h-screen shadow-2xl relative flex flex-col">
             {children}
+            <Toaster position="top-center" theme="system" richColors closeButton />
           </div>
         </ThemeProvider>
       </body>

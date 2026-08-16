@@ -7,6 +7,7 @@ import { AppleLoader } from '@/components/AppleLoader'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
+import { toast } from 'sonner'
 
 type ScanResult = {
   name: string
@@ -72,6 +73,9 @@ function ScanContent() {
       if (!res.ok) throw new Error(data.error || 'Failed to scan')
       
       setResult(data)
+      if (data.fallbackUsed) {
+        toast.info('Використано базову модель (3.5 Flash Lite) через високе навантаження.')
+      }
     } catch (err: any) {
       setError(err.message)
     } finally {

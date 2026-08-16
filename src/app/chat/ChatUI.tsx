@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { Send, Sparkles } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
-
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 type Message = {
   id?: string
@@ -54,6 +54,10 @@ export default function ChatUI({ initialMessages, sessionId }: { initialMessages
       
       setMessages(prev => [...prev, { role: 'assistant', content: data.message }])
       
+      if (data.fallbackUsed) {
+        toast.info('Використано базову модель (3.5 Flash Lite) через високе навантаження.')
+      }
+
       // Refresh the page data so the sidebar updates its title/sorting
       router.refresh()
     } catch (err) {

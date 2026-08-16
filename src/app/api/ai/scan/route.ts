@@ -55,8 +55,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid mode' }, { status: 400 })
     }
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
+    let response;
+    let fallbackUsed = false;
+    
+    const requestConfig = {
       contents: [
         {
           role: 'user',
@@ -74,12 +76,31 @@ export async function POST(req: Request) {
       config: {
         responseMimeType: 'application/json',
       }
-    })
+    };
+
+    try {
+      response = await ai.models.generateContent({
+        model: 'gemini-3.5-flash',
+        ...requestConfig
+      })
+    } catch (apiError: any) {
+      if (apiError?.status === 429 || apiError?.message?.toLowerCase().includes('quota') || apiError?.message?.toLowerCase().includes('exhausted')) {
+        console.warn("Primary model rate limited, falling back to gemini-3.5-flash-lite");
+        fallbackUsed = true;
+        response = await ai.models.generateContent({
+          model: 'gemini-3.5-flash-lite',
+          ...requestConfig
+        })
+      } else {
+        throw apiError;
+      }
+    }
 
     const responseText = response.text || ''
     
     try {
       const parsed = JSON.parse(responseText)
+      parsed.fallbackUsed = fallbackUsed;
       return NextResponse.json(parsed)
     } catch (e) {
       console.error("Failed to parse Gemini response:", responseText)
