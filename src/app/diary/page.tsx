@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ProgressRing } from '@/components/ProgressRing'
 import { MacroBar } from '@/components/MacroBar'
-import { Plus, Camera, ScanBarcode, Settings, MessageCircle, LineChart, Loader2, Repeat } from 'lucide-react'
+import { Plus, Camera, ScanBarcode, Settings, MessageCircle, LineChart, Loader2, Repeat, ChevronDown } from 'lucide-react'
 import { deleteFoodEntry, deleteWaterEntry, addWaterEntry } from './actions'
 import { useProfile, useTodayEntries, useTodayWater } from '@/hooks/useSupabase'
 import { WaterTrackerButton } from '@/components/WaterTrackerButton'
@@ -119,8 +119,19 @@ export default function DiaryPage() {
           <div className="flex-1 flex flex-col items-center animate-in fade-in zoom-in-95 duration-300 w-full">
             <WaterTrackerButton onAdd={handleAddWater} />
             
+            {/* Scroll down hint */}
+            {waterLogs && waterLogs.length > 0 && (
+              <button 
+                onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
+                className="flex flex-col items-center gap-1 opacity-40 hover:opacity-100 transition-opacity animate-bounce mt-4 mb-4 text-sm font-medium"
+              >
+                <span>Історія випитої води ({waterLogs.length})</span>
+                <ChevronDown className="w-5 h-5" />
+              </button>
+            )}
+            
             {/* Water History */}
-            <div className="w-full mt-8 flex flex-col gap-2 pb-8">
+            <div className="w-full mt-4 flex flex-col gap-2 pb-8">
               {waterLogs && waterLogs.length > 0 ? (
                 waterLogs.map((log) => (
                   <div key={log.id} className="flex justify-between items-center p-3 bg-(--card) shadow-sm border border-(--border)/50 rounded-xl w-full">
