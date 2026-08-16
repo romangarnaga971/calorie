@@ -40,12 +40,6 @@ export default function DiaryPage() {
       <header className="flex items-center justify-between p-6 pb-2">
         <h1 className="text-2xl font-bold">Yabka</h1>
         <div className="flex items-center gap-3">
-          <Link href="/progress" className="p-2 bg-(--input) rounded-full hover:opacity-80 flex items-center justify-center text-(--foreground)">
-            <LineChart className="w-5 h-5" />
-          </Link>
-          <Link href="/chat" className="p-2 bg-(--input) rounded-full hover:opacity-80 flex items-center justify-center text-(--accent)">
-            <MessageCircle className="w-5 h-5" />
-          </Link>
           <Link href="/settings" className="p-2 bg-(--input) rounded-full hover:opacity-80 flex items-center justify-center text-(--foreground)">
             <Settings className="w-5 h-5" />
           </Link>
@@ -77,7 +71,7 @@ export default function DiaryPage() {
       <div className="flex flex-col gap-3">
         {entries && entries.length > 0 ? (
           entries.map((entry) => (
-            <div key={entry.id} className="flex justify-between items-center p-4 bg-(--input) rounded-2xl">
+            <div key={entry.id} className="flex justify-between items-center p-4 bg-(--card) shadow-sm border border-(--border) rounded-2xl">
               <div className="flex flex-col">
                 <span className="font-medium">{entry.name}</span>
                 <span className="text-sm opacity-60">
@@ -111,15 +105,21 @@ export default function DiaryPage() {
       </div>
 
       {/* Floating Action Buttons */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center justify-center gap-3 bg-(--card) p-3 rounded-full shadow-lg border border-(--border)">
-        <Link href="/diary/manual" className="flex flex-col items-center justify-center w-14 h-14 bg-(--input) text-(--foreground) rounded-full hover:bg-(--border) transition-colors">
-          <Plus className="w-6 h-6" />
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center justify-between bg-(--card) p-3 px-4 rounded-full shadow-lg border border-(--border) w-[92%] max-w-[380px]">
+        <Link href="/progress" className="flex items-center justify-center w-12 h-12 text-(--foreground) hover:opacity-80 transition-opacity">
+          <LineChart className="w-6 h-6" />
         </Link>
-        <Link href="/diary/scan" className="flex items-center justify-center w-16 h-16 bg-(--accent) text-(--accent-foreground) rounded-full shadow-md hover:opacity-90 transition-opacity">
+        <Link href="/diary/manual" className="flex items-center justify-center w-12 h-12 bg-(--input) text-(--foreground) rounded-full hover:bg-(--border) transition-colors">
+          <Plus className="w-5 h-5" />
+        </Link>
+        <Link href="/diary/scan" className="flex items-center justify-center w-16 h-16 bg-(--accent) text-(--accent-foreground) rounded-full shadow-md hover:opacity-90 transition-opacity shrink-0">
           <Camera className="w-7 h-7" />
         </Link>
-        <Link href="/diary/scan?mode=label" className="flex items-center justify-center w-14 h-14 bg-(--input) text-(--foreground) rounded-full hover:bg-(--border) transition-colors">
-          <ScanBarcode className="w-6 h-6" />
+        <Link href="/diary/scan?mode=label" className="flex items-center justify-center w-12 h-12 bg-(--input) text-(--foreground) rounded-full hover:bg-(--border) transition-colors">
+          <ScanBarcode className="w-5 h-5" />
+        </Link>
+        <Link href="/chat" className="flex items-center justify-center w-12 h-12 text-(--accent) hover:opacity-80 transition-opacity">
+          <MessageCircle className="w-6 h-6" />
         </Link>
       </div>
     </div>

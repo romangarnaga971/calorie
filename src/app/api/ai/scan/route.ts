@@ -27,7 +27,7 @@ export async function POST(req: Request) {
         Estimate its weight in grams and nutritional values for the entire portion shown.
         Return ONLY a valid JSON object with the following fields and types:
         {
-          "name": string (Dish name in Ukrainian),
+          "name": string (Dish name in Ukrainian. VERY IMPORTANT: Append a relevant food emoji at the end, e.g. "Борщ 🍲", "Яблуко 🍎"),
           "weight_g": number (estimated total weight),
           "calories": number (total kcal),
           "protein_g": number,
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
         Extract the exact nutritional values PER 100g or 100ml.
         Return ONLY a valid JSON object with the following fields and types:
         {
-          "name": string (Guess the product name in Ukrainian, or return "Продукт"),
+          "name": string (Guess the product name in Ukrainian, or return "Продукт". VERY IMPORTANT: Append a relevant food emoji at the end, e.g. "Молоко 🥛"),
           "weight_g": 100,
           "calories": number (kcal per 100g),
           "protein_g": number (per 100g),
