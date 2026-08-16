@@ -45,9 +45,9 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="flex flex-col flex-1 p-6 animate-in">
-      <header className="flex items-center gap-4 mb-8">
-        <Link href="/diary" className="p-2 -ml-2 hover:bg-(--input) rounded-full transition-colors">
+    <div className="flex flex-col flex-1 px-6 pb-12 animate-in relative">
+      <header className="sticky top-0 z-10 flex items-center gap-4 mb-6 py-4 bg-(--background)/80 backdrop-blur-lg -mx-6 px-6 border-b border-(--border)/50">
+        <Link href="/diary" className="p-2 -ml-2 bg-(--input) hover:bg-(--border) rounded-full transition-colors">
           <ArrowLeft className="w-6 h-6" />
         </Link>
         <h1 className="text-2xl font-bold">Налаштування</h1>
