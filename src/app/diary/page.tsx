@@ -37,9 +37,9 @@ export default function DiaryPage() {
 
   return (
     <div className="flex flex-col flex-1 p-6 pb-24 animate-in">
-      <header className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold">Щоденник</h1>
-        <div className="flex gap-2">
+      <header className="flex items-center justify-between p-6 pb-2">
+        <h1 className="text-2xl font-bold">Yabka</h1>
+        <div className="flex items-center gap-3">
           <Link href="/progress" className="p-2 bg-(--input) rounded-full hover:opacity-80 flex items-center justify-center text-(--foreground)">
             <LineChart className="w-5 h-5" />
           </Link>

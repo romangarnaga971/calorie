@@ -1,6 +1,6 @@
 {
-  "name": "AI Calorie Tracker",
-  "short_name": "Калорії AI",
+  "name": "Yabka",
+  "short_name": "Yabka",
   "description": "Трекер калорій зі штучним інтелектом",
   "start_url": "/",
   "display": "standalone",

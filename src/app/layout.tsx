@@ -9,13 +9,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "AI Calorie Tracker",
+  title: "Yabka",
   description: "Personal AI Calorie Tracker PWA",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "AI Calorie Tracker",
+    title: "Yabka",
   },
 };
 

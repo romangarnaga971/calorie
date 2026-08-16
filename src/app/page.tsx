@@ -28,7 +28,7 @@ export default async function Home() {
           <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
         </svg>
       </div>
-      <h1 className="text-3xl font-bold mb-3">AI Calorie Tracker</h1>
+      <h1 className="text-3xl font-bold mb-3">Yabka</h1>
       <p className="text-(--foreground) opacity-70 mb-8 max-w-[280px]">
         Відстежуй свої калорії за допомогою штучного інтелекту, просто фотографуючи їжу.
       </p>
