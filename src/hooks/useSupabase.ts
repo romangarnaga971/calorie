@@ -1,6 +1,6 @@
 import useSWR from 'swr'
 import { createClient } from '@/lib/supabase/client'
-import { startOfDay, endOfDay } from 'date-fns'
+import { startOfDay, endOfDay, subDays } from 'date-fns'
 
 const supabase = createClient()
 
@@ -100,10 +100,12 @@ export function useProgressHistory() {
   const { data: user, isLoading: isUserLoading } = useUser()
   const fetcher = async () => {
     if (!user) return []
+    const twoWeeksAgo = startOfDay(subDays(new Date(), 14)).toISOString()
     const { data } = await supabase
       .from('food_entries')
       .select('*')
       .eq('user_id', user.id)
+      .gte('logged_at', twoWeeksAgo)
       .order('logged_at', { ascending: true })
     return data || []
   }

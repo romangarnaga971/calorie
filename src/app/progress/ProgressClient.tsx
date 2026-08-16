@@ -2,9 +2,12 @@
 
 import { useState } from 'react'
 import { logWeight, updateNorms } from './actions'
-import { Loader2, Sparkles, Check } from 'lucide-react'
+import { Loader2, Sparkles, Check, TrendingUp, Flame } from 'lucide-react'
 import { useFormStatus } from 'react-dom'
 import { toast } from 'sonner'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
+import { format, subDays, startOfDay, parseISO } from 'date-fns'
+import { uk } from 'date-fns/locale'
 
 function SubmitWeightButton() {
   const { pending } = useFormStatus()
@@ -25,10 +28,48 @@ type Recommendation = {
   recommended_protein_change: number
 } | null
 
-export default function ProgressClient({ currentCalories, currentProtein, weightLogs }: { currentCalories: number, currentProtein: number, weightLogs: any[] }) {
+export default function ProgressClient({ currentCalories, currentProtein, weightLogs, progressHistory }: { currentCalories: number, currentProtein: number, weightLogs: any[], progressHistory: any[] }) {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [recommendation, setRecommendation] = useState<Recommendation>(null)
   const [isApplying, setIsApplying] = useState(false)
+
+  // Process calorie data for the last 7 days
+  const last7Days = Array.from({ length: 7 }).map((_, i) => {
+    const d = subDays(new Date(), 6 - i)
+    return {
+      dateStr: format(d, 'yyyy-MM-dd'),
+      displayDate: format(d, 'dd MMM', { locale: uk }),
+      calories: 0
+    }
+  })
+
+  progressHistory?.forEach(entry => {
+    try {
+      const entryDateStr = format(parseISO(entry.logged_at), 'yyyy-MM-dd')
+      const day = last7Days.find(d => d.dateStr === entryDateStr)
+      if (day) {
+        day.calories += entry.calories
+      }
+    } catch (e) {
+      // Ignore invalid dates
+    }
+  })
+
+  const totalCals7Days = last7Days.reduce((sum, day) => sum + day.calories, 0)
+  const daysWithData = last7Days.filter(d => d.calories > 0).length
+  const avgCals = daysWithData > 0 ? Math.round(totalCals7Days / daysWithData) : 0
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-(--card) border border-(--border) p-3 rounded-xl shadow-lg">
+          <p className="text-sm opacity-60 mb-1">{label}</p>
+          <p className="font-bold text-(--accent)">{payload[0].value} <span className="text-xs font-normal opacity-70">ккал</span></p>
+        </div>
+      )
+    }
+    return null
+  }
 
   const handleAnalyze = async () => {
     setIsAnalyzing(true)
@@ -59,6 +100,57 @@ export default function ProgressClient({ currentCalories, currentProtein, weight
 
   return (
     <div className="flex flex-col gap-8">
+      {/* 7-Day Chart */}
+      <section>
+        <h2 className="text-lg font-semibold mb-4">Споживання за 7 днів</h2>
+        
+        <div className="flex gap-3 mb-6">
+          <div className="flex-1 bg-(--card) border border-(--border) rounded-2xl p-4">
+            <div className="flex items-center gap-2 opacity-60 mb-1">
+              <TrendingUp className="w-4 h-4" />
+              <span className="text-xs font-medium uppercase tracking-wider">Середнє</span>
+            </div>
+            <span className="text-2xl font-bold">{avgCals} <span className="text-sm font-normal opacity-60">ккал</span></span>
+          </div>
+          <div className="flex-1 bg-(--card) border border-(--border) rounded-2xl p-4">
+            <div className="flex items-center gap-2 opacity-60 mb-1">
+              <Flame className="w-4 h-4 text-orange-500" />
+              <span className="text-xs font-medium uppercase tracking-wider text-orange-500">Норма</span>
+            </div>
+            <span className="text-2xl font-bold">{currentCalories} <span className="text-sm font-normal opacity-60">ккал</span></span>
+          </div>
+        </div>
+
+        <div className="bg-(--card) border border-(--border) rounded-3xl p-5 pt-8 h-[260px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={last7Days} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>
+              <XAxis 
+                dataKey="displayDate" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fontSize: 12, fill: 'var(--foreground)', opacity: 0.5 }} 
+                dy={10}
+              />
+              <YAxis 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fontSize: 12, fill: 'var(--foreground)', opacity: 0.5 }}
+                dx={-10}
+              />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--border)', opacity: 0.4 }} />
+              <ReferenceLine y={currentCalories} stroke="var(--accent)" strokeDasharray="5 5" strokeOpacity={0.6} />
+              <Bar 
+                dataKey="calories" 
+                fill="var(--accent)" 
+                radius={[6, 6, 6, 6]} 
+                barSize={32}
+                activeBar={{ fill: 'var(--foreground)' }}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </section>
+
       {/* Weight Logging Form */}
       <section>
         <h2 className="text-lg font-semibold mb-4">Логування ваги</h2>

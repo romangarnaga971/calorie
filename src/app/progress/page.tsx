@@ -4,15 +4,16 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, TrendingDown, TrendingUp, Minus, Loader2 } from 'lucide-react'
 import ProgressClient from './ProgressClient'
-import { useProfile, useUser, useWeightLogs } from '@/hooks/useSupabase'
+import { useProfile, useUser, useWeightLogs, useProgressHistory } from '@/hooks/useSupabase'
 
 export default function ProgressPage() {
   const router = useRouter()
   const { data: user, isLoading: isUserLoading } = useUser()
   const { data: profile, isLoading: isProfileLoading } = useProfile()
   const { data: weightLogs, isLoading: isWeightLoading } = useWeightLogs()
+  const { data: progressHistory, isLoading: isProgressLoading } = useProgressHistory()
 
-  if (isUserLoading || isProfileLoading || isWeightLoading) {
+  if (isUserLoading || isProfileLoading || isWeightLoading || isProgressLoading) {
     return (
       <div className="flex flex-col items-center justify-center flex-1 min-h-[100dvh]">
         <Loader2 className="w-8 h-8 animate-spin text-(--accent) opacity-50" />
@@ -55,6 +56,7 @@ export default function ProgressPage() {
         currentCalories={profile.daily_calories} 
         currentProtein={profile.daily_protein_g}
         weightLogs={weightLogs || []} 
+        progressHistory={progressHistory || []}
       />
     </div>
   )
